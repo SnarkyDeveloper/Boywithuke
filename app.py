@@ -41,10 +41,9 @@ def get_all_albums():
                 else:
                     for album in albums['items']:
                         album_tracks = spotify.album_tracks(album['uri'])
-                        if not len(album_tracks['items']) == 1:
-                            if not album_tracks['items'][0]['name'] == 'Gaslight':
-                                all_album_uris.append(album['uri'])
-                    break
+                        if not len(album_tracks['items']) == 1 and not album_tracks['items'][0]['name'] == 'Gaslight':
+                            all_album_uris.append(album['uri'])
+                    offset += 50
             return all_album_uris
         except Exception as e:
             print(f"Error fetching albums: {e}")
@@ -126,9 +125,9 @@ def api_top_tracks():
     if not spotify_oauth.get_cached_token():
         return jsonify({'error': 'Not authenticated'}), 401
     tracks = get_top_tracks()
-    if tracks:
-        return jsonify({'tracks': tracks})
-    return jsonify({'error': 'Error fetching top tracks'}), 500
+    if not tracks:
+        return jsonify({'error': 'You have never listened to any songs from the artist'}), 404
+    return jsonify({'tracks': tracks})
 
 
 @app.route('/callback')
