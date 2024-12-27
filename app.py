@@ -5,7 +5,8 @@ from spotipy.cache_handler import FlaskSessionCacheHandler
 import dotenv
 import os
 import random
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 dotenv.load_dotenv(override=True)
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-key')
@@ -20,7 +21,11 @@ def create_spotify_oauth():
         cache_handler=cache_handler,
         show_dialog=False,
     )
-
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["240 per day", "60 per hour"]
+)
 def authenticate_user():
     spotify_oauth = create_spotify_oauth()
     auth_url = spotify_oauth.get_authorize_url()
@@ -112,6 +117,7 @@ def authenticate():
     return redirect(auth_link)
 
 @app.route('/top-tracks')
+@limiter.limit("1/minute")
 def top_tracks():
     spotify_oauth = create_spotify_oauth()
     if not spotify_oauth.get_cached_token():

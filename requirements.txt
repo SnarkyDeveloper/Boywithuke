@@ -1,3 +1,4 @@
-flask==3.1.0
+flask == 3.1.0
 spotipy == 2.24.0
-python-dotenv==1.0.1
+python-dotenv == 1.0.1
+flask_limter == 3.9.2 
