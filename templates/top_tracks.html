@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Top BoyWithUke Tracks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            background-image: url('{{ random_album_cover }}'); /* Dynamically set the cover image */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 20px;
+            color: #ffffff;
+            position: relative;
+        }
+
+        /* Add an overlay to ensure text remains readable */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 24, 29, 0.85); /* Maintains theme while allowing image to show through */
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px;
+            background-color: #2d2d2d;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .tracks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+        
+        .track-card {
+            background: #333333;
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .track-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .track-card img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .track-card h3 {
+            margin: 10px 0;
+            color: #ffffff;
+        }
+
+        .track-card p {
+            color: #b3b3b3;
+        }
+        
+        .reload-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #1DB954;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Top BoyWithUke Tracks</h1>
+        <div id="loader" class="loader"></div>
+        <div class="tracks-container" style="display: none;">
+            {% for track in tracks %}
+                <div class="track-card" onclick="window.open('spotify:track:{{ track.uri }}', '_blank')">
+                    <img src="{{ track.cover_url }}" alt="{{ track.album_name }} cover">
+                    <h3>{{ track.name }}</h3>
+                    <p>{{ track.album_name }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <button class="reload-btn" onclick="reloadTracks()">Reload Tracks</button>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+
+    <script>
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.querySelector('.tracks-container').style.display = 'grid';
+            }, 1000);
+        }
+
+        function reloadTracks() {
+            document.getElementById('loader').style.display = 'block';
+            document.querySelector('.tracks-container').style.display = 'none';
+
+            // Simulate fetching new data
+            setTimeout(() => {
+                // Here you would typically make an AJAX request to fetch new data
+                // For demonstration, we'll just hide the loader and show the tracks again
+                document.getElementById('loader').style.display = 'none';
+                document.querySelector('.tracks-container').style.display = 'grid';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
+

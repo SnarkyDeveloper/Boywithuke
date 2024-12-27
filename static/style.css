@@ -1,0 +1,131 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1a1a1a;
+    background-image: url('https://yt3.googleusercontent.com/ypWJ0E4BxCimsOgP7jRPy0x718ZW36CdXzPLKE2k-ZbMukTF-nONlzlcCbM3aVjglUuQyJETQQ=s160-c-k-c0x00ffffff-no-rj');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 20px;
+    color: #ffffff;
+    position: relative;
+}
+
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 24, 29, 0.85);
+    z-index: -1;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px;
+    background-color: #2d2d2d;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #1DB954;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #1ed760;
+    transform: scale(1.05);
+}
+
+.tracks-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 20px;
+}
+
+.track-card {
+    background: #333333;
+    border-radius: 12px;
+    padding: 15px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.track-card:hover {
+    transform: translateY(-5px);
+}
+
+.track-card img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.track-card h3 {
+    margin: 10px 0;
+    color: #ffffff;
+}
+
+.track-card p {
+    color: #b3b3b3;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #1DB954;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.logout-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff5555;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #ff3333;
+}
+
+.reload-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #28a745;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-top: 25px;
+    transition: all 0.3s ease;
+}
+
+.reload-btn:hover {
+    background-color: #218838;
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoyWithUke Music</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to BoyWithUke's Music Dashboard</h1>
+        <p>Discover your most played tracks from BoyWithUke's discography</p>
+        <form action="{{ url_for('authenticate') }}" method="POST">
+            <button type="submit">Connect with Spotify</button>
+        </form>
+        <p style="margin-top: 20px;">
+            <a href="https://open.spotify.com/artist/1Cd373x8qzC7SNUg5IToqp" 
+               target="_blank" 
+               style="color: #1DB954; text-decoration: none;">
+                Visit BoyWithUke on Spotify
+            </a>
+        </p>
+    </div>
+</body>
+</html>
