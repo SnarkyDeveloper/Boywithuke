@@ -8,7 +8,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1a1a1a;
-            background-image: url('{{ random_album_cover }}'); /* Dynamically set the cover image */
+            background-image: url('{{ random_album_cover }}'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -19,7 +19,6 @@
             position: relative;
         }
 
-        /* Add an overlay to ensure text remains readable */
         body::before {
             content: '';
             position: fixed;
@@ -27,7 +26,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 24, 29, 0.85); /* Maintains theme while allowing image to show through */
+            background: rgba(21, 21, 21, 0.85); 
             z-index: -1;
         }
 
@@ -92,40 +91,60 @@
     <div class="container">
         <h1>Your Top BoyWithUke Tracks</h1>
         <div id="loader" class="loader"></div>
-        <div class="tracks-container" style="display: none;">
-            {% for track in tracks %}
-                <div class="track-card" onclick="window.open('spotify:track:{{ track.uri }}', '_blank')">
-                    <img src="{{ track.cover_url }}" alt="{{ track.album_name }} cover">
-                    <h3>{{ track.name }}</h3>
-                    <p>{{ track.album_name }}</p>
-                </div>
-            {% endfor %}
+        <div class="tracks-container">
         </div>
         <button class="reload-btn" onclick="reloadTracks()">Reload Tracks</button>
         <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
     </div>
 
     <script>
-        window.onload = function() {
-            setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                document.querySelector('.tracks-container').style.display = 'grid';
-            }, 1000);
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTracks();
+        });
 
-        function reloadTracks() {
+        function loadTracks() {
             document.getElementById('loader').style.display = 'block';
             document.querySelector('.tracks-container').style.display = 'none';
+        
+            fetch('{{ url_for("api_top_tracks") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching tracks:', data.error);
+                        document.getElementById('loader').style.display = 'none';
+                        return;
+                    }
+        
+                    const tracksContainer = document.querySelector('.tracks-container');
+                    tracksContainer.innerHTML = '';
+        
+                    data.tracks.forEach(track => {
+                        const trackCard = document.createElement('div');
+                        trackCard.className = 'track-card';
+                        trackCard.onclick = () => window.open(`spotify:track:${track.album_uri}`, '_blank');
+        
+                        trackCard.innerHTML = `
+                            <img src="${track.cover_url}" alt="${track.album_name} cover">
+                            <h3>${track.name}</h3>
+                            <p>${track.album_name}</p>
+                        `;
+        
+                        tracksContainer.appendChild(trackCard);
+                    });
+        
+                    document.getElementById('loader').style.display = 'none';
+                    document.querySelector('.tracks-container').style.display = 'grid';
+                })
+                .catch(error => {
+                    console.error('Error fetching tracks:', error);
+                    document.getElementById('loader').style.display = 'none';
+                });
+        }
+        
 
-            // Simulate fetching new data
-            setTimeout(() => {
-                // Here you would typically make an AJAX request to fetch new data
-                // For demonstration, we'll just hide the loader and show the tracks again
-                document.getElementById('loader').style.display = 'none';
-                document.querySelector('.tracks-container').style.display = 'grid';
-            }, 1000);
+        function reloadTracks() {
+            loadTracks();
         }
     </script>
 </body>
 </html>
-

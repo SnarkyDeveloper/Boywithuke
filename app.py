@@ -1,13 +1,15 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 import dotenv
 import os
 import random
+
 dotenv.load_dotenv(override=True)
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-key')
+
 def create_spotify_oauth():
     cache_handler = FlaskSessionCacheHandler(session)
     return SpotifyOAuth(
@@ -18,10 +20,12 @@ def create_spotify_oauth():
         cache_handler=cache_handler,
         show_dialog=False,
     )
+
 def authenticate_user():
     spotify_oauth = create_spotify_oauth()
     auth_url = spotify_oauth.get_authorize_url()
     return auth_url
+
 def get_all_albums():
     spotify_oauth = create_spotify_oauth()
     token_info = spotify_oauth.get_cached_token()
@@ -83,6 +87,7 @@ def get_top_tracks():
             print(f"Error fetching tracks: {e}")
             return None
     return None
+
 def get_random_cover(oauth):
     spotify = spotipy.Spotify(auth_manager=oauth)
     albums = spotify.artist_albums('1Cd373x8qzC7SNUg5IToqp')
@@ -93,19 +98,19 @@ def get_random_cover(oauth):
     random_album_uri = random.choice(album_uris)
     album = spotify.album(random_album_uri)
     return album['images'][0]['url']
+
 @app.route('/')
 def index():
     spotify_oauth = create_spotify_oauth()
     if spotify_oauth.get_cached_token():
         return redirect(url_for('top_tracks'))
 
-    
     return render_template('index.html')
+
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
     auth_link = authenticate_user()
     return redirect(auth_link)
-
 
 @app.route('/top-tracks')
 def top_tracks():
@@ -113,10 +118,18 @@ def top_tracks():
     if not spotify_oauth.get_cached_token():
         return redirect(url_for('index'))
     cover = get_random_cover(oauth=spotify_oauth)
+    return render_template('top_tracks.html', random_album_cover=cover)
+
+@app.route('/api/top-tracks')
+def api_top_tracks():
+    spotify_oauth = create_spotify_oauth()
+    if not spotify_oauth.get_cached_token():
+        return jsonify({'error': 'Not authenticated'}), 401
     tracks = get_top_tracks()
     if tracks:
-        return render_template('top_tracks.html', tracks=tracks, random_album_cover=cover)
-    return 'Error fetching top tracks.', 500
+        return jsonify({'tracks': tracks})
+    return jsonify({'error': 'Error fetching top tracks'}), 500
+
 
 @app.route('/callback')
 def callback():
@@ -138,5 +151,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 
