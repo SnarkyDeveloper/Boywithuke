@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session, j
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from redis import Redis
+from redis import Redis
 import dotenv
 import os
 import random
@@ -10,24 +11,24 @@ from flask_limiter.util import get_remote_address
 import json
 from spotipy.cache_handler import CacheHandler
 
+import json
+from spotipy.cache_handler import CacheHandler
+
 dotenv.load_dotenv(override=True)
 
-# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-key')
 
-# Set up Redis client for caching
 redis_client = Redis(host='localhost', port=6379, db=0)
 
-# Flask-Limiter setup for rate limiting
 limiter = Limiter(
     app=app,
     key_func=get_remote_address,
     default_limits=["240 per day", "60 per hour"]
 )
 
-# Create Spotify OAuth instance with Redis cache handler
 def create_spotify_oauth():
+    cache_handler = RedisCacheHandler(redis=redis_client, key='spotify_token')
     cache_handler = RedisCacheHandler(redis=redis_client, key='spotify_token')
     return SpotifyOAuth(
         client_id=os.getenv('client_id'),
@@ -55,7 +56,6 @@ class RedisCacheHandler(CacheHandler):
         self.redis.set(self.key, json.dumps(token_info))
 
 
-# Helper functions for interacting with Spotify
 def get_all_albums():
     spotify_oauth = create_spotify_oauth()
     token_info = spotify_oauth.get_cached_token()
@@ -141,6 +141,11 @@ def authenticate_user():
     auth_url = spotify_oauth.get_authorize_url()
     return auth_url
 
+def authenticate_user():
+    spotify_oauth = create_spotify_oauth()
+    auth_url = spotify_oauth.get_authorize_url()
+    return auth_url
+
 @app.route('/top-tracks')
 @limiter.limit("1/minute")
 def top_tracks():
@@ -167,7 +172,7 @@ def callback():
     if code:
         try:
             token_info = spotify_oauth.get_access_token(code, as_dict=True)
-            session['token_info'] = token_info  # Store token in session
+            session['token_info'] = token_info
             return redirect(url_for('top_tracks'))
         except Exception as e:
             print(f"Error in callback: {e}")
@@ -180,4 +185,6 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
+    app.run(host=os.getenv('host', '0.0.0.0'))
+
     app.run(host=os.getenv('host', '0.0.0.0'))
